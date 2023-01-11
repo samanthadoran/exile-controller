@@ -4,7 +4,7 @@ use super::egui_overlay;
 use crate::controller::action_manager::ActionManager;
 use crate::controller::input::{GamepadManager, ControllerType};
 use crate::game_window_tracker::GameWindowTracker;
-use crate::settings::{OverlaySettings, ControllerSettings};
+use crate::settings::{Overlay, Controller};
 
 use egui::{Vec2, Context, epaint, Color32};
 use egui_backend::{egui, UserApp};
@@ -89,11 +89,11 @@ impl Default for OverlayImages {
 
 
 struct GameOverlay {
-    overlay_settings: OverlaySettings,
+    overlay_settings: Overlay,
     game_window_tracker: GameWindowTracker,
     window_rect: Rect, // TODO: Can get rid of this
     overlay_images: OverlayImages,
-    controller_settings: ControllerSettings,
+    controller_settings: Controller,
     gamepad_manager: GamepadManager, 
     game_action_handler: ActionManager,
     remote_open: bool,
@@ -379,7 +379,7 @@ impl UserApp<egui_window_glfw_passthrough::GlfwWindow, WgpuBackend> for GameOver
     }
 }
 
-pub fn start_overlay(overlay_settings: OverlaySettings, controller_settings: ControllerSettings, gamepad_manager: GamepadManager, game_action_handler: ActionManager, game_window_tracker: GameWindowTracker) {
+pub fn start_overlay(overlay_settings: Overlay, controller_settings: Controller, gamepad_manager: GamepadManager, game_action_handler: ActionManager, game_window_tracker: GameWindowTracker) {
     let screen_width = overlay_settings.screen_width();
     let screen_height = overlay_settings.screen_height();
     let game_overlay = GameOverlay{
