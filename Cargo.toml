@@ -9,15 +9,14 @@ config = "0.13.3"
 serde = "1.0.151"
 gilrs = {version ="0.10.1", default-features = false, features = ["xinput"]}
 rdev = "0.5.2"
-active-win-pos-rs = "0.7.1"
+active-win-pos-rs = "0.8.1"
 native-dialog = "0.6.3"
 
 # egui
-#egui = "0.21.0"
 egui_backend = { version = "0.4.0", features = ["egui_bytemuck"] }
 egui_overlay = "0.4.1"
-egui_extras = {version = "0.21.0", features = ["image"]}
-image = { version = "0.24", features = ["png"] }
+egui_extras = {version = "0.22.0", features = ["image"]}
+image = { version = "0.24.7", features = ["png"] }
 egui_window_glfw_passthrough = "0.4.1"
 
 [target.'cfg(windows)'.build-dependencies]
