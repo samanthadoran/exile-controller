@@ -1,15 +1,19 @@
 use std::process::exit;
 
-use super::egui_overlay;
+use egui_backend::{egui, egui::DragValue, WindowBackend};
+use egui_backend::egui::{Vec2, Context, epaint, Color32, Rect, Pos2, Area};
+use egui_overlay::EguiOverlay;
+#[cfg(not(target_os = "macos"))]
+use egui_overlay::egui_render_three_d::ThreeDBackend as DefaultGfxBackend;
+#[cfg(target_os = "macos")]
+use egui_render_wgpu::WgpuBackend as DefaultGfxBackend;
+
+
 use crate::controller::action_manager::ActionManager;
 use crate::controller::input::{GamepadManager, ControllerType};
 use crate::game_window_tracker::GameWindowTracker;
 use crate::settings::{OverlaySettings, ControllerSettings};
 
-use egui::{Vec2, Context, epaint, Color32};
-use egui_backend::{egui, UserApp};
-use egui_backend::egui::{Rect, Pos2};
-use crate::overlay::egui_render_wgpu::egui_render_wgpu::WgpuBackend;
 use egui_extras::RetainedImage;
 
 use std::fs;
@@ -103,13 +107,13 @@ struct GameOverlay {
 
 impl GameOverlay {
     fn place_overlay_image(&self, ctx: &Context, image: &RetainedImage, position: Pos2, id_source: &str) {
-        egui_backend::egui::Area::new(id_source)
-                                    .movable(false)
-                                    .fixed_pos(position)
-                                    .interactable(false)
-                                    .show(ctx,|ui| {
-                                        ui.image(image.texture_id(ctx), image.size_vec2());
-                                    });
+        // Area::new(id_source)
+        //                             .movable(false)
+        //                             .fixed_pos(position)
+        //                             .interactable(false)
+        //                             .show(ctx,|ui| {
+        //                                 ui.image(image.texture_id(ctx), image.size_vec2());
+        //                             });
     }
 
     fn place_face_overlay_images (&self, ctx: &Context, images: &OverlayImages) {
@@ -313,12 +317,12 @@ impl GameOverlay {
     }
 }
 
-impl UserApp<egui_window_glfw_passthrough::GlfwWindow, WgpuBackend> for GameOverlay {
-    fn run(
+impl EguiOverlay for GameOverlay {
+    fn gui_run(
         &mut self,
         egui_context: &egui_backend::egui::Context,
-        glfw_backend: &mut egui_window_glfw_passthrough::GlfwWindow,
-        _: &mut WgpuBackend,
+        _default_gfx_backend: &mut DefaultGfxBackend,
+        glfw_backend: &mut egui_window_glfw_passthrough::GlfwBackend,
     ) {
         glfw_backend.window.set_size(self.overlay_settings.screen_width() as i32, self.overlay_settings.screen_height() as i32);
         glfw_backend.window.set_resizable(false);
@@ -354,7 +358,7 @@ impl UserApp<egui_window_glfw_passthrough::GlfwWindow, WgpuBackend> for GameOver
         // This includes an offscreen remote or only images being drawn.
 
         #[cfg(target_os = "linux")]
-        egui_backend::egui::Area::new("No Crash Rectangle")
+        egui::Area::new("No Crash Rectangle")
                                         .default_pos(Pos2{x:0.0,y:0.0})
                                         .show(egui_context,|ui| { 
                                             let size = Vec2::splat(1.0);
@@ -389,5 +393,5 @@ pub fn start_overlay(overlay_settings: OverlaySettings, controller_settings: Con
         game_input_started: false,
     };
 
-    egui_overlay::start_egui_overlay(game_overlay, screen_width as i32, screen_height as i32);
+    egui_overlay::start(game_overlay);
 }
